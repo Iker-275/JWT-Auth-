@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const connectDB = require("./db/connect");
+const authRoutes = require("./routes/authRoutes");
 require("dotenv").config();
 
 
@@ -19,6 +20,8 @@ app.get("/",(req,res)=>{
 app.get("/smoothies",(req,res)=>{
     res.render("smoothies");
 })
+
+app.use("/",authRoutes);
 
 
 app.listen(PORT,async()=>{
