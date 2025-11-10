@@ -2,13 +2,23 @@ const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 
 const handleErrors = (err) => {
-   // console.log(err.message,err.code);
+    // console.log(err.message,err.code);
 
     let errors = { email: "", password: "" }
+//incorrect email
+ if (err.message === 'Incorrect Password') {
+        errors.password = "You have entered an incorrect password.Try again.";
+        return errors;
+    }
 
-     //duplicate error code
-    if(err.code === 11000){
-        errors.email ="That email is already registered";
+    if (err.message ==='Incorrect email') {
+        errors.email = "Email is not registered.Try again.";
+        return errors;
+    }
+
+    //duplicate error code
+    if (err.code === 11000) {
+        errors.email = "That email is already registered";
         return errors;
     }
 
@@ -27,9 +37,9 @@ const handleErrors = (err) => {
     return errors;
 }
 
-const maxAge = 1 * 24 *  60 * 60; //age in seconds -1 day
-const  createToken = (id)=>{
-    return jwt.sign({ id },'secrety',{
+const maxAge = 1 * 24 * 60 * 60; //age in seconds -1 day
+const createToken = (id) => {
+    return jwt.sign({ id }, 'secrety', {
         expiresIn: maxAge,
 
     });
@@ -46,7 +56,7 @@ const signUp_post = async (req, res) => {
     try {
         const user = await User.create({ email, password });
         const token = createToken(user._id);
-        res.cookie('jwt',token,{httpOnly:true, maxAge:maxAge * 1000});
+        res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 });
         res.status(201).json({ success: true, user });
     } catch (error) {
         const errors = handleErrors(error);
@@ -60,8 +70,19 @@ const login_get = async (req, res) => {
 
 const login_post = async (req, res) => {
     const { email, password } = req.body;
-    console.log(email, password);
-    res.send('user login')
+    try {
+        const user = await User.login(email, password);
+        const token = createToken(user._id);
+        res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 });
+
+        res.status(200).json({ success: true, user });
+
+    } catch (error) {
+    console.log(error);
+       const errors = handleErrors(error);
+        res.status(400).json({ success: false ,errors})
+
+    }
 }
 
 module.exports = { signUp_get, signUp_post, login_get, login_post };
