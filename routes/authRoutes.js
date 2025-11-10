@@ -1,5 +1,5 @@
 const {Router} = require("express");
-const { signUp_get, signUp_post, login_get, login_post } = require("../controllers/authController")
+const { signUp_get, signUp_post, login_get, login_post,logout_get } = require("../controllers/authController")
 
 const router = Router();
 
@@ -10,6 +10,7 @@ router.post("/signup",signUp_post)
 router.get("/login",login_get)
 router.post("/login",login_post)
 
+router.get("/logout",logout_get)
 
 
 

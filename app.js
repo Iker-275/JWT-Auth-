@@ -4,22 +4,26 @@ const connectDB = require("./db/connect");
 const authRoutes = require("./routes/authRoutes");
 require("dotenv").config();
 const cookieParser = require("cookie-parser");
+const { requireAuth,checkUser } = require("./middleware/authMiddleware")
 
 //middleware
 app.use(express.static("public"));
 app.use(express.json());
 app.use(cookieParser())
-
+app.use(checkUser);
 //
 app.set("view engine",'ejs')
 
 const PORT = process.env.PORT || 5000;
 
-app.get("/",(req,res)=>{
+
+//routes
+//  app.get("",checkUser);
+app.get("/",requireAuth,(req,res)=>{
     res.render("home");
 })
 
-app.get("/smoothies",(req,res)=>{
+app.get("/smoothies",requireAuth,(req,res)=>{
     res.render("smoothies");
 })
 
